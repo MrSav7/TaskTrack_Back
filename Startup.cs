@@ -1,4 +1,4 @@
-﻿using KyrsachAPI.Context;
+﻿//using KyrsachAPI.Context;
 using KyrsachAPI.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,8 +32,8 @@ namespace KyrsachAPI
 
         private void ConfigureContext()
         {
-            Servies.AddDbContext<TaskTrackContext>(
-                options => options.UseSqlServer("TaskTrack") );
+            /*Servies.AddDbContext<TaskTrackContext>(
+                options => options.UseSqlServer("TaskTrack") );*/
         }
 
         private void ConfigureServices()

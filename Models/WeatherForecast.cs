@@ -1,4 +1,4 @@
-namespace KyrsachAPI
+namespace KyrsachAPI.Models
 {
     public class WeatherForecast
     {

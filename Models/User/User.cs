@@ -1,14 +1,27 @@
-﻿namespace KyrsachAPI.Models.User
+﻿using System;
+using System.Collections.Generic;
+
+namespace KyrsachAPI.Models.User;
+
+public partial class User
 {
-    public class User
-    {
-        public int Id { get; set; }
-        public string Login { get; set; }
-        public string Password { get; set; }
-        public string Email { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string? MiddleName { get; set; }
-    }
+    public int UserId { get; set; }
+
+    public string UserLogin { get; set; } = null!;
+
+    public string UserPassword { get; set; } = null!;
+
+    public string UserFirstName { get; set; } = null!;
+
+    public string UserLastName { get; set; } = null!;
+
+    public string? UserMiddleName { get; set; }
+
+    public DateTime UserCreateDate { get; set; }
+
+    public string UserEmail { get; set; } = null!;
+
+    public bool UserActiveStatus { get; set; }
+
+    public int UserRoleId { get; set; }
 }

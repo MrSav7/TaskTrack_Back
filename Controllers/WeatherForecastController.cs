@@ -1,3 +1,4 @@
+using KyrsachAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KyrsachAPI.Controllers
