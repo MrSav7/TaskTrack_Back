@@ -1,7 +1,14 @@
-﻿//using KyrsachAPI.Context;
+﻿using KyrsachAPI.Context;
+using KyrsachAPI.Entities;
 using KyrsachAPI.Service;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
+using System.Text;
 
 namespace KyrsachAPI
 {
@@ -15,13 +22,19 @@ namespace KyrsachAPI
         {
             Servies = collection;
             ConfigRoot = config;
+            var appSettings = config.GetSection("AppSettings").Get<AppSettings>();
+            string key = appSettings.SecretJWTKey;
+
             ConfigureProperties();
             ConfigureContext();
             ConfigureServices();
+            ConfigureAuth(key);
         }
 
         private void ConfigureProperties()
         {
+            Servies.Configure<AppSettings>(ConfigRoot.GetSection("AppSettings"));
+
             Servies.AddOptions();
             Servies.AddControllers();
             Servies.AddEndpointsApiExplorer();
@@ -32,13 +45,50 @@ namespace KyrsachAPI
 
         private void ConfigureContext()
         {
-            /*Servies.AddDbContext<TaskTrackContext>(
-                options => options.UseSqlServer("TaskTrack") );*/
+            Servies.AddDbContext<TaskTrackContext>(
+                options => options.UseSqlServer("TaskTrack") );
         }
 
         private void ConfigureServices()
         {
             Servies.AddScoped<IUserService,UserService>();
+            Servies.AddScoped<ITokenService,TokenService>();
+            Servies.AddScoped<IIdentityService,IdentityService>();
+            Servies.AddScoped<ITasksService, TasksService>();
+        }
+
+        private void ConfigureAuth(string key)
+        {
+            Servies.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        // указывает, будет ли валидироваться издатель при валидации токена
+                        ValidateIssuer = true,
+                        // строка, представляющая издателя
+                        ValidIssuer = "TastTreakServer",
+                        // будет ли валидироваться потребитель токена
+                        ValidateAudience = true,
+                        // установка потребителя токена
+                        ValidAudience = "TastTreakServerUser",
+                        // будет ли валидироваться время существования
+                        ValidateLifetime = true,
+                        // установка ключа безопасности
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                        // валидация ключа безопасности
+                        ValidateIssuerSigningKey = true,
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            context.Token = context.Request.Cookies["token"];
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
         }
 
         public void ConfigureWebApp(WebApplication webApp)

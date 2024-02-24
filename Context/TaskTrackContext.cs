@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using KyrsachAPI.Models;
 using KyrsachAPI.Models.User;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace KyrsachAPI.Context;
 
@@ -16,11 +18,25 @@ public partial class TaskTrackContext : DbContext
     {
     }
 
+    public virtual DbSet<MenuItem> MenuItems { get; set; }
+
+    public virtual DbSet<MenuItemsAccess> MenuItemsAccesses { get; set; }
+
+    public virtual DbSet<Tasks> Tasks { get; set; }
+
+    public virtual DbSet<TaskExecutor> TaskExecutors { get; set; }
+
+    public virtual DbSet<TaskStep> TaskSteps { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserActiveStatus> UserActiveStatuses { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
+
+    public DbSet<ProductType> ProductTypes { get; set; }
+
+    public DbSet<Brands> Brands { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -28,6 +44,55 @@ public partial class TaskTrackContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<MenuItem>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("MenuItems", "snd");
+
+            entity.Property(e => e.MenuItemId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MenuItemName).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<MenuItemsAccess>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("MenuItemsAccess", "snd");
+
+            entity.Property(e => e.AccessMenuId).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<Tasks>(entity =>
+        {
+            entity
+                .ToTable("Task");
+
+            entity.Property(e => e.TaskCloseDate).HasColumnType("datetime");
+            entity.Property(e => e.TaskCreateDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.TaskId).ValueGeneratedOnAdd();
+            entity.Property(e => e.TaskPlanExeTime).HasColumnType("datetime");
+            entity.Property(e => e.TaskProductModel).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<TaskExecutor>(entity =>
+        {
+            entity.HasNoKey();
+
+            entity.Property(e => e.TaskExecutorId).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<TaskStep>(entity =>
+        {
+            entity.Property(e => e.TaskStepCreateDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.TaskStepId).ValueGeneratedOnAdd();
+            entity.Property(e => e.TaskStepText).HasMaxLength(300);
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity
@@ -44,7 +109,7 @@ public partial class TaskTrackContext : DbContext
             entity.Property(e => e.UserLastName).HasMaxLength(15);
             entity.Property(e => e.UserLogin).HasMaxLength(20);
             entity.Property(e => e.UserMiddleName).HasMaxLength(15);
-            entity.Property(e => e.UserPassword).HasMaxLength(32);
+            entity.Property(e => e.UserPassword).HasMaxLength(64);
         });
 
         modelBuilder.Entity<UserActiveStatus>(entity =>
