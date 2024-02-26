@@ -57,18 +57,6 @@ namespace KyrsachAPI.Service
                 _trackContext.Tasks.Add(t);
                 _trackContext.SaveChanges();
 
-                /*int? taskId = _trackContext.Tasks.AsNoTracking()
-                    .Where(o => o.TaskStatusId == newtask.TaskStatusId && o.TaskUserProblemDesc == newtask.TaskUserProblemDesc)
-                    .FirstOrDefault()
-                    .TaskId;*/
-
-                /*if(taskId == null)
-                {
-                    tr.Rollback();
-                    _logger.LogInformation("Не удалось создать шаг к заявке");
-                    return false;
-                }*/
-
                 _trackContext.TaskSteps.Add(new TaskStep()
                 {
                     TaskId = t.TaskId,

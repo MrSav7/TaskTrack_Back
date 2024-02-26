@@ -55,6 +55,7 @@ namespace KyrsachAPI
             Servies.AddScoped<ITokenService,TokenService>();
             Servies.AddScoped<IIdentityService,IdentityService>();
             Servies.AddScoped<ITasksService, TasksService>();
+            Servies.AddScoped<IStatisticService, StatisticService>();
         }
 
         private void ConfigureAuth(string key)
