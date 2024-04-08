@@ -40,6 +40,16 @@ namespace KyrsachAPI
             Servies.AddEndpointsApiExplorer();
             Servies.AddSwaggerGen();
             Servies.AddHttpContextAccessor();
+            Servies.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin",
+                    builder =>
+                    {
+                        builder.AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials(); // Разрешить отправку куки
+                    });
+            });
 
         }
 

@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KyrsachAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class IdentityController : ControllerBase
@@ -15,7 +16,8 @@ namespace KyrsachAPI.Controllers
         private readonly IIdentityService _identityService;
 
         //private int UserId => Int32.TryParse(User.Identity!.userId);
-        private int UserId = 1;
+        private int UserId => Convert.ToInt32(User.FindFirstValue("userId"));
+        //private int UserId = 1;
         public IdentityController(ILogger<IdentityController> logger, IIdentityService identityService)
         {
             _logger = logger;

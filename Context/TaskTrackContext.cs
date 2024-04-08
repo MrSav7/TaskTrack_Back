@@ -38,6 +38,8 @@ public partial class TaskTrackContext : DbContext
     public DbSet<ProductType> ProductTypes { get; set; }
 
     public DbSet<Brands> Brands { get; set; }
+    public DbSet<TaskCustomer> TaskCustomer { get; set; }
+    public DbSet<TaskStatuses> TaskStatuses { get; set; }
 
     //public DbSet<TaskStastusToday> TaskStastusToday { get; set; }
 
@@ -82,8 +84,6 @@ public partial class TaskTrackContext : DbContext
 
         modelBuilder.Entity<TaskExecutor>(entity =>
         {
-            entity.HasNoKey();
-
             entity.Property(e => e.TaskExecutorId).ValueGeneratedOnAdd();
         });
 
@@ -94,12 +94,12 @@ public partial class TaskTrackContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.TaskStepId).ValueGeneratedOnAdd();
             entity.Property(e => e.TaskStepText).HasMaxLength(300);
+
         });
 
         modelBuilder.Entity<User>(entity =>
         {
             entity
-                .HasNoKey()
                 .ToTable("Users", "snd");
 
             entity.Property(e => e.UserActiveStatus).HasDefaultValue(true);

@@ -1,4 +1,6 @@
-﻿using KyrsachAPI.Service;
+﻿using KyrsachAPI.Entities.Statistic;
+using KyrsachAPI.Entities.Tasks;
+using KyrsachAPI.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +21,36 @@ namespace KyrsachAPI.Controllers
             _statisticService = statisticService;
         }
 
-        [HttpGet]
+        [HttpGet("TaskStastus")]
         public IActionResult TaskStastusToday()
         {
             var result = _statisticService.TaskStastusToday();
             return new JsonResult(result);
+        }
+
+        [HttpPost("TaskStastusFiltered")]
+        public IActionResult TaskStastusFiltered([FromBody] TaskStastusFilter dates)
+        {
+            var result = _statisticService.TaskStastusFiltered(dates);
+            return new JsonResult(result);
+        }
+
+        [HttpGet("TaskStatusUsers")]
+        public List<TaskStatusUser> TaskStatusUsers()
+        {
+            return _statisticService.TaskStatusUsers();
+        }
+
+        [HttpGet("TaskStatBrand")]
+        public List<TaskStatBrand> TaskStatBrand()
+        {
+            return _statisticService.TaskStatBrand();
+        }
+
+        [HttpGet("TaskStatProdType")]
+        public List<TaskStatProdType> TaskStatProdType()
+        {
+            return _statisticService.TaskStatProdType();
         }
     }
 }

@@ -14,5 +14,15 @@
         public int TaskStatusId { get; } = 1;
 
         public string TaskUserProblemDesc { get; set; } = null!;
+
+        public string TaskCustomerFirstName { get; set; } = null!;
+
+        public string TaskCustomerLastName { get; set; } = null!;
+
+        public string TaskCustomerMiddleName { get; set; }
+
+        public string TaskCustomerPhone { get; set; } = null!;
+
+        public int ExecutorId { get; set; }
     }
 }

@@ -1,7 +1,8 @@
 ﻿using KyrsachAPI.Context;
+using KyrsachAPI.Entities.User;
 using KyrsachAPI.Models.User;
-using Microsoft.Build.Execution;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using StoredProcedureEFCore;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,6 +13,11 @@ namespace KyrsachAPI.Service
     {
         List<User> GetAllUsers();
         User Authenticate(string UserLogin, string UserPassword);
+        List<AmdGetUsers> AmdGetUsers(int? userId);
+        List<UserActiveStatus> getStatusTipes();
+        bool ChangeUserStatus(int userId, int status);
+        void CreateNewUser(NewUserForm form);
+        List<UserRole> GetRoles();
     }
 
     public class UserService: IUserService
@@ -78,6 +84,69 @@ namespace KyrsachAPI.Service
                 }
                 return sb.ToString();
             }
+        }
+
+        public List<AmdGetUsers> AmdGetUsers(int? userId)
+        {
+            List<AmdGetUsers> res = new List<AmdGetUsers>();
+            if(userId == null)
+            {
+                _context.LoadStoredProc("[dbo].[AdmPanGetUsers]")
+                .Exec(result => res = result.ToList<AmdGetUsers>());
+                return res;
+            }
+
+            _context.LoadStoredProc("[dbo].[AdmPanGetUsers]")
+                .AddParam("userId", userId.Value)
+                .Exec(result => res = result.ToList<AmdGetUsers>());
+            return res;
+        }
+
+        public List<UserActiveStatus> getStatusTipes()
+        {
+            return _context.UserActiveStatuses.ToList();
+        }
+
+        public bool ChangeUserStatus(int userId, int status)
+        {
+            var u = _context.Users.Where(u => u.UserId == userId).First();
+            if(u == null)
+            {
+                return false;
+            }
+
+            using (var tr = _context.Database.BeginTransaction())
+            {
+                u.UserActiveStatus = Convert.ToBoolean(status);
+                _context.SaveChanges();
+                tr.Commit();
+            }
+            return true;
+        }
+
+        public void CreateNewUser(NewUserForm form)
+        {
+            User user = new User()
+            {
+                UserLogin = form.UserLogin,
+                UserPassword = GetSHA256Hash(form.UserPassword),
+                UserEmail = form.UserEmail,
+                UserFirstName = form.UserFirstName,
+                UserLastName = form.UserLastName,
+                UserMiddleName = form.UserMiddleName,
+                UserRoleId = form.UserRoleId,
+                UserActiveStatus = true
+            };
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+        }
+
+        public List<UserRole> GetRoles()
+        {
+            return _context.UserRoles.AsNoTracking()
+                .OrderBy(o => o.RoleId)
+                .ToList();
         }
     }
 }

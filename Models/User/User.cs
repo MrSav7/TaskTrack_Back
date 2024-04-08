@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace KyrsachAPI.Models.User;
 
 public partial class User
 {
+    [Key]
     public int UserId { get; set; }
 
     public string UserLogin { get; set; } = null!;

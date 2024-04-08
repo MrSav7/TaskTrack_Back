@@ -1,7 +1,10 @@
 ﻿using KyrsachAPI.Entities.User;
+using KyrsachAPI.Models.User;
 using KyrsachAPI.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using NuGet.Common;
 
 namespace KyrsachAPI.Controllers
 {
@@ -18,13 +21,6 @@ namespace KyrsachAPI.Controllers
             _logger = logger;
             _userService = userService;
             _tokenService = tokenService;
-        }
-
-        [Authorize]
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok();
         }
 
         [Authorize]
@@ -51,8 +47,58 @@ namespace KyrsachAPI.Controllers
 
             var newToken = _tokenService.GenerateNewToken(result);
 
-            HttpContext.Response.Cookies.Append("token", newToken.ToString());
+            //HttpContext.Response.Cookies.Append("token", newToken.ToString());
+            return new JsonResult(new { token = newToken });
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpGet("AmdGetUsersById/{userId}")]
+        public List<AmdGetUsers> AmdGetUsersById(int? userId) {
+            return _userService.AmdGetUsers(userId);
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpGet("AmdGetUsers")]
+        public List<AmdGetUsers> AmdGetUsers()
+        {
+            return _userService.AmdGetUsers(null);
+        }
+
+        [HttpGet("StatusTypes")]
+        public List<UserActiveStatus> getStatusTipes()
+        {
+            return _userService.getStatusTipes();
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost("ChangeUserStatus")]
+        public IActionResult ChangeUserStatus([FromBody] ChangeUserStatusFiler f)
+        {
+            var r = _userService.ChangeUserStatus(f.userId, f.statusId);
+            if (r)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost("CreateNewUser")]
+        public IActionResult CreateNewUser([FromBody] NewUserForm form)
+        {
+            _userService.CreateNewUser(form);
             return Ok();
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpGet("GetRoles")]
+        public List<UserRole> GetRoles()
+        {
+            return _userService.GetRoles();
         }
     }
 }

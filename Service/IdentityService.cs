@@ -1,5 +1,6 @@
 ﻿using KyrsachAPI.Context;
 using KyrsachAPI.Models.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KyrsachAPI.Service
 {
@@ -39,7 +40,8 @@ namespace KyrsachAPI.Service
                 {
                     MenuItemId = m.MenuItemId,
                     MenuItemName = m.MenuItemName,
-                    MenuItemOrderNumber = m.MenuItemOrderNumber
+                    MenuItemOrderNumber = m.MenuItemOrderNumber,
+                    MenuItemsRoute = m.MenuItemsRoute
                 } )
                 .ToList();
         }
